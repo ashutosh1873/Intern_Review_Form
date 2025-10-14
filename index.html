@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Review of Interns</title>
+<style>
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f5f7fa;
+    margin: 0;
+    padding: 0;
+  }
+
+  .container {
+    max-width: 600px;
+    background: #fff;
+    margin: 40px auto;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 25px;
+  }
+
+  label {
+    display: block;
+    margin-top: 15px;
+    font-weight: 600;
+    color: #444;
+  }
+
+  input, textarea, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 14px;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  .stars {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 10px 0;
+  }
+
+  .star {
+    font-size: 30px;
+    cursor: pointer;
+    color: #ccc;
+    transition: color 0.2s, transform 0.2s;
+  }
+
+  .star:hover, .star.selected {
+    color: gold;
+    transform: scale(1.2);
+  }
+
+  .center {
+    text-align: center;
+  }
+
+  button {
+    display: block;
+    margin: 25px auto 0;
+    padding: 12px 25px;
+    background: #0078D7;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  button:hover {
+    background: #005fa3;
+  }
+
+  #msg {
+    text-align: center;
+    margin-top: 15px;
+    font-weight: 600;
+  }
+
+  .success {
+    color: green;
+  }
+  .error {
+    color: red;
+  }
+
+  input[type="checkbox"] {
+    width: auto;
+    margin-right: 6px;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h2>Review of Interns</h2>
+    <form id="reviewForm">
+      <label>Name of Intern</label>
+      <input type="text" id="name" name="name" placeholder="Please enter your Name here">
+
+      <label>Email (Compulsory)</label>
+      <input type="email" id="email" name="email" placeholder="Please enter your Email here" required>
+
+      <label>Batch</label>
+      <select id="batch" name="batch" required>
+        <option value="">Select your Batch</option>
+        <option value="AHC SEPT BATCH 01">AHC SEPT BATCH 01</option>
+      </select>
+
+      <label class="center">Rating (1–5 Stars)</label>
+      <div class="stars" id="stars">
+        <span class="star" data-val="1">★</span>
+        <span class="star" data-val="2">★</span>
+        <span class="star" data-val="3">★</span>
+        <span class="star" data-val="4">★</span>
+        <span class="star" data-val="5">★</span>
+      </div>
+
+      <input type="hidden" id="rating" name="rating" />
+
+      <label>Give your Detailed Ratings:</label>
+      <textarea id="review" name="review" rows="5" placeholder="Please write your detailed review here..." required></textarea>
+
+      <div style="margin-top:15px;">
+        <input type="checkbox" id="anon" name="anonymous"> Stay Anonymous
+      </div>
+
+      <button type="submit"><b>Submit Review</b></button>
+    </form>
+    <div id="msg"></div>
+  </div>
+
+<script>
+  // 🌐 Your Web App URL
+  const scriptURL = "https://script.google.com/macros/s/AKfycbxdvNgQFoBWiZdYwndDOiKO-f-Pu0Y9MdcOwDkOvflC7gJpN7EmtNBvD8Vd1Avyx-lCHA/exec";
+
+  let rating = 0;
+  const stars = document.querySelectorAll('.star');
+  const ratingInput = document.getElementById('rating');
+
+  stars.forEach(s => {
+    s.addEventListener('click', () => {
+      rating = s.dataset.val;
+      ratingInput.value = rating;
+      stars.forEach(st => st.classList.toggle('selected', st.dataset.val <= rating));
+    });
+  });
+
+  document.getElementById('reviewForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const form = e.target;
+    const msg = document.getElementById('msg');
+    msg.textContent = "Submitting...";
+    msg.className = "";
+
+    try {
+      const res = await fetch(scriptURL, { method: "POST", body: new FormData(form) });
+      const text = await res.text();
+      console.log("Response:", text);
+      msg.textContent = "✅ Thank you! Your review has been submitted.";
+      msg.className = "success";
+      form.reset();
+      rating = 0;
+      stars.forEach(st => st.classList.remove('selected'));
+    } catch (err) {
+      console.error(err);
+      msg.textContent = "❌ Error submitting review. Try again later.";
+      msg.className = "error";
+    }
+  });
+</script>
+</body>
+</html>
